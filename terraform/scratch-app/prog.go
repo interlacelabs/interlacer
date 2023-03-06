@@ -1,8 +1,8 @@
 package main
 
 import (
-	"io"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 )
@@ -11,7 +11,7 @@ func main() {
 
 	fmt.Println("Starting...")
 	var client http.Client
-	resp, err := client.Get("http://myip.dnsomatic.com")
+	resp, err := client.Get("http://ipv4.icanhazip.com")
 	if err == nil {
 		defer resp.Body.Close()
 		
