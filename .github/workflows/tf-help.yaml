@@ -7,46 +7,64 @@ on:
 jobs:
   show-help:
     # Only run for comments starting with "terraform help" in a pull request.
-    if: >
-      startsWith(github.event.comment.body, 'terraform help')
-      && startsWith(github.event.issue.pull_request.url, 'https://')
+    if: github.event.issue.pull_request && contains(github.event.comment.body, 'terraform help')
 
     name: Terraform Show Help
     runs-on: ubuntu-latest
 
     steps:
-      - name: 'Load PR Details'
-        id: load-pr
-        run: |
-          set -eu
-          resp=$(curl -sSf \
-            --url ${{ github.event.issue.pull_request.url }} \
-            --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-            --header 'content-type: application/json')
-          sha=$(jq -r '.head.sha' <<< "$resp")
-          echo "::set-output name=head_sha::$sha"
-          comments_url=$(jq -r '.comments_url' <<< "$resp")
-          echo "::set-output name=comments_url::$comments_url"
+      - name: Get PR branch
+        uses: xt0rted/pull-request-comment-branch@v1
+        id: comment-branch
 
-      - name: Checkout
+      - name: Set latest commit status as pending
+        uses: myrotvorets/set-commit-status-action@master
+        with:
+          sha: ${{ steps.comment-branch.outputs.head_sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: pending
+
+      - name: Checkout PR branch
         uses: actions/checkout@v3
         with:
-          # By default (in a non-pull request build) you get HEAD of 'master'
-          ref: ${{ steps.load-pr.outputs.head_sha }}
-          # submodules: 'true'
-          # token: ${{ secrets.deploy_user_PAT }} # Needed for private submodules
+          ref: ${{ steps.comment-branch.outputs.head_ref }}
 
-      - name: Show Help
-        env:
-          COMMENTS_URL: ${{ steps.load-pr.outputs.comments_url }}
-        run: |
-          set -eu
-          echo "Sending help text to: $COMMENTS_URL"
-          helpPayload=$(cat .github/workflows/tf-help.md | jq -R --slurp '{body: .}')
+      # - name: Set latest commit status as ${{ job.status }}
+      #   uses: myrotvorets/set-commit-status-action@master
+      #   if: always()
+      #   with:
+      #     sha: ${{ steps.comment-branch.outputs.head_sha }}
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     status: ${{ job.status }}
 
-          resp=$(echo $helpPayload | curl -sSf \
-            --url $COMMENTS_URL \
-            --data @- \
-            --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-            --header 'content-type: application/json')
-          echo "Adding comment returned: $resp"
+      - name: Add comment to PR
+        uses: actions/github-script@v6
+        if: always()
+        with:
+          script: |
+            const name = '${{ github.workflow   }}';
+            const url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
+            const success = '${{ job.status }}' === 'success';
+            const body = `${name}: ${success ? 'succeeded ✅' : 'failed ❌'}\n${url}`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })
+
+      # - name: Show Help
+      #   env:
+      #     COMMENTS_URL: ${{ steps.load-pr.outputs.comments_url }}
+      #   run: |
+      #     set -eu
+      #     echo "Sending help text to: $COMMENTS_URL"
+      #     helpPayload=$(cat .github/workflows/tf-help.md | jq -R --slurp '{body: .}')
+
+      #     resp=$(echo $helpPayload | curl -sSf \
+      #       --url $COMMENTS_URL \
+      #       --data @- \
+      #       --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+      #       --header 'content-type: application/json')
+      #     echo "Adding comment returned: $resp"
