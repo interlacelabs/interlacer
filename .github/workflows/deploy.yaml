@@ -30,7 +30,7 @@ jobs:
       - name: "Event"
         run: echo ${{ github.event_name }}
 
-  LaceworkInlineScanner:
+  Lacework:
     # if: github.event_name == 'pull_request'
     needs: [Build]
     uses: ./.github/workflows/lacework_vuln_check.yaml
