@@ -8,7 +8,7 @@ RUN cd /app && CGO_ENABLED=0 go build -ldflags="-w -s" -o prog prog.go
 
 
 ################################################
-# minimal scratch image v2
+# alpine image
 ################################################
 
 FROM alpine:3.13.4
