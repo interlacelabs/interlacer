@@ -4,6 +4,10 @@ on:
   issue_comment: 
     types: [created]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   show-help:
     # Only run for comments starting with "terraform help" in a pull request.
