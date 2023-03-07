@@ -11,8 +11,7 @@ RUN cd /app && CGO_ENABLED=0 go build -ldflags="-w -s" -o prog prog.go
 # minimal scratch image v2
 ################################################
 
-# FROM alpine:3.13.4
-FROM alpine:3.16
+FROM alpine:3.13.4
 
 # staging for go app
 WORKDIR /app
