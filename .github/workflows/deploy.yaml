@@ -31,7 +31,7 @@ jobs:
         run: echo ${{ github.event_name }}
 
   Lacework:
-    # if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request'
     needs: [Build]
     uses: ./.github/workflows/lacework_vuln_check.yaml
     secrets: inherit
