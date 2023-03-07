@@ -3,6 +3,7 @@ name: lacework_vuln_check
 permissions:
   contents: read
   pull-requests: write
+  statuses: write
 
 on:
   workflow_call:
