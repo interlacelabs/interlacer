@@ -6,6 +6,7 @@ ADD prog.go /app
 RUN apk update && apk add build-base
 RUN cd /app && CGO_ENABLED=0 go build -ldflags="-w -s" -o prog prog.go
 
+
 ################################################
 # alpine image
 ################################################
