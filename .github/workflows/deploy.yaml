@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-  
 
 jobs:
   Build:
@@ -15,20 +14,26 @@ jobs:
 
       - name: "Build the Docker image"
         run: |
-          docker build terraform/alpine-app --tag alpine-app:${{github.run_number}}
+          docker build terraform/alpine-app --tag alpine-app:${{github.sha}}
 
       - name: "Run ID"
         run: echo ${{ github.run_id }}
+      
+      - name: "Commit SHA"
+        run: echo ${{ github.sha }}
 
-  #   LaceworkInlineScanner:
-  #     #if: github.event_name == 'pull_request'
-  #     needs: [Build]
-  #     uses: ./.github/workflows/lacework_vuln_check.yaml
-  #     secrets: inherit
-  #     with:
-  #       dockerfile: terraform/alpine-app
-  #       image_name: alpine-app
-  #       image_tag: ${{github.run_number}}
+      - name: "Event"
+        run: echo ${{ github.event_name }}
+
+  LaceworkInlineScanner:
+    if: github.event_name == 'pull_request'
+    needs: [Build]
+    uses: ./.github/workflows/lacework_vuln_check.yaml
+    secrets: inherit
+    with:
+      dockerfile: terraform/alpine-app
+      image_name: alpine-app
+      image_tag: ${{github.sha}}
 
   #   # LaceworkIaCSecurity:
 
