@@ -12,7 +12,6 @@ RUN cd /app && CGO_ENABLED=0 go build -ldflags="-w -s" -o prog prog.go
 ################################################
 
 FROM alpine:3.13.4
-# FROM alpine:3.16
 
 # staging for go app
 WORKDIR /app
