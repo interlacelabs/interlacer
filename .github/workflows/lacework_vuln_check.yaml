@@ -7,10 +7,12 @@ on:
         description: "docker image to be scanned"
         required: true
         type: string
+        default: ${{ vars.IMAGE_NAME }}
       image_tag:
         description: "docker image tag to be scanned"
         required: true
         type: string
+        default: ${{ github.sha }}
       build_id:
         description: "unique id for this build run"
         type: string
@@ -23,6 +25,7 @@ on:
         description: "dockerfile path to build image"
         required: true
         type: string
+        default: ${{ vars.DOCKERFILE }}
 
   workflow_dispatch: # allow this workflow to be run manually
 
@@ -39,7 +42,7 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: "Build the Docker image"
         run: |
           docker build ${{ inputs.dockerfile }} --tag ${{ inputs.image_name }}:${{ inputs.image_tag }}
