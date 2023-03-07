@@ -29,12 +29,12 @@ jobs:
           echo "::set-output name=comments_url::$comments_url"
 
       - name: Checkout
-        uses: actions/checkout@1.0.0
+        uses: actions/checkout@v3
         with:
           # By default (in a non-pull request build) you get HEAD of 'master'
           ref: ${{ steps.load-pr.outputs.head_sha }}
-          submodules: 'true'
-          token: ${{ secrets.deploy_user_PAT }} # Needed for private submodules
+          # submodules: 'true'
+          # token: ${{ secrets.deploy_user_PAT }} # Needed for private submodules
 
       - name: Show Help
         env:
