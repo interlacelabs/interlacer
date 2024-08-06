@@ -21,4 +21,3 @@ terraform init -backend-config=backend.tfvars
 ```
 terraform plan -var-file=backend.tfvars -var-file=variables.tfvars
 ```
-
